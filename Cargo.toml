@@ -3,6 +3,9 @@ name = "irelzk-rs"
 version = "0.1.0"
 edition = "2021"
 
+[dev-dependencies]
+hex = "0.4"
+
 [profile.release]
 opt-level = 3
 lto = true 

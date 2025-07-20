@@ -1,6 +1,11 @@
 #![allow(unused_imports)]
-pub mod aes256;
 pub mod params;
+pub mod crypto {
+    pub mod aes256;
+    pub mod keccak;
+    pub mod shake;
+}
 
 use params::{Q, GAMMA2};
-pub use aes256::Aes256Ctx;
+use crate::crypto::aes256::Aes256Ctx;
+use crate::crypto::shake::Shake128;

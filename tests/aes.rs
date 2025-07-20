@@ -1,4 +1,4 @@
-use irelzk_rs::aes256::Aes256Ctx;
+use irelzk_rs::crypto::aes256::Aes256Ctx;
 
 #[test]
 fn test_squeezeblocks() {

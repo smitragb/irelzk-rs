@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use crate::keccak::KeccakState;
+use crate::crypto::keccak::KeccakState;
 
 pub const SHAKE128_RATE: usize = 168;
 pub struct Shake128 {
@@ -7,7 +7,7 @@ pub struct Shake128 {
 }
 
 impl Shake128 {
-    pub fn new() -> Self {
+    pub fn init() -> Self {
         Self {
             state: KeccakState::init(),
         }

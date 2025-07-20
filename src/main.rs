@@ -1,7 +1,9 @@
-mod aes256;
 mod params;
+/*
 mod keccak;
 mod shake;
+mod aes256;
+*/
 use params::{GAMMA2, Q};
 
 fn main() {
