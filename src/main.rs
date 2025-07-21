@@ -1,4 +1,6 @@
 mod params;
+mod poly;
+mod rounding;
 use consts::{MONT, QDATA, _8XDIV, _8XQ, _8XQINV, _PMASK, _ZETAS, _ZETAS_QINV};
 /*
 mod keccak;
