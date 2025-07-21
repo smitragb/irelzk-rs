@@ -2,9 +2,13 @@
 name = "irelzk-rs"
 version = "0.1.0"
 edition = "2021"
+build = "build.rs"
 
 [dev-dependencies]
 hex = "0.4"
+
+[build-dependencies]
+cc = "1.0.25"
 
 [profile.release]
 opt-level = 3

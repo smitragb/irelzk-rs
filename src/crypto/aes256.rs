@@ -1,5 +1,3 @@
-#![cfg(target_arch = "x86_64")]
-
 use std::arch::x86_64::*;
 
 #[repr(C, align(16))]
@@ -15,9 +13,6 @@ pub const AES256CTR_BLOCKBYTES: u8 = 64;
 #[allow(dead_code)]
 impl Aes256Ctx {
 
-    #[target_feature(enable = "aes")]
-    #[target_feature(enable = "sse2")]
-    #[target_feature(enable = "ssse3")]
     pub unsafe fn init(key: &[u8; 32], nonce: u64) -> Self {
         let mut rkeys = [_mm_setzero_si128(); 16];
         let mut idx = 0;
@@ -105,9 +100,6 @@ impl Aes256Ctx {
     } 
 
 
-    #[target_feature(enable = "aes")]
-    #[target_feature(enable = "sse2")]
-    #[target_feature(enable = "ssse3")]
     #[allow(dead_code)]
     pub unsafe fn prf (out: &mut [u8], seed: &[u8; 32], nonce: u64) {
         let mut ctx = Aes256Ctx::init(seed, nonce);
@@ -128,9 +120,6 @@ impl Aes256Ctx {
         unsafe {self.n = _mm_loadl_epi64(&nonce as *const u64 as *const __m128i);}
     }
 
-    #[target_feature(enable = "aes")]
-    #[target_feature(enable = "sse2")]
-    #[target_feature(enable = "ssse3")]
     unsafe fn encrypt4 (&mut self, out: &mut [u8; 64]) {
         /* Load current counter value */
         let f = _mm_load_si128(&self.n);
@@ -175,9 +164,6 @@ impl Aes256Ctx {
 
     }
 
-    #[target_feature(enable = "aes")]
-    #[target_feature(enable = "sse2")]
-    #[target_feature(enable = "ssse3")]
     pub unsafe fn squeezeblocks(&mut self, out: &mut [u8], nblocks: usize) {
         assert!(out.len() >= 64*nblocks);
         for chunk in out.chunks_exact_mut(64) {
