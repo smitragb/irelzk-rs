@@ -8,7 +8,7 @@ pub struct Aes256Ctx {
 }
 
 #[allow(dead_code)]
-pub const AES256CTR_BLOCKBYTES: u8 = 64;
+pub const AES256CTR_BLOCKBYTES: usize = 64;
 
 #[allow(dead_code)]
 impl Aes256Ctx {
