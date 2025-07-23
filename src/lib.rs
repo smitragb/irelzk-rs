@@ -5,6 +5,10 @@ pub mod crypto {
     pub mod keccak;
     pub mod shake;
 }
+pub mod poly;
+pub mod ntt;
+pub mod consts;
+pub mod rounding;
 
 use params::{Q, GAMMA2};
 use crate::crypto::aes256::Aes256Ctx;

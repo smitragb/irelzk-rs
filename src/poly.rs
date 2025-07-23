@@ -1,12 +1,15 @@
 #![allow(dead_code)]
 use std::{arch::x86_64::*, ops::{Deref, DerefMut}};
 
-use irelzk_rs::{crypto::aes256::{Aes256Ctx, AES256CTR_BLOCKBYTES}, params::SYMBYTES};
-
-use crate::{consts::{QDATA, QINV, REJIDX, _8XQ}, ntt::{forward_ntt, inverse_ntt}, params::{N, Q}};
+use crate::{
+    crypto::aes256::{Aes256Ctx, AES256CTR_BLOCKBYTES}, 
+    params::{SYMBYTES, N, Q},
+    consts::{QDATA, QINV, REJIDX, _8XQ}, 
+    ntt::{forward_ntt, inverse_ntt}
+};
 
 #[repr(align(32))]
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Poly{
     pub coeffs: [i32; N],
 }
@@ -54,7 +57,7 @@ impl Poly {
     }
 
     pub fn ntt (&mut self) {
-        forward_ntt(&mut self.coeffs, QDATA.0); 
+        forward_ntt(&mut self.coeffs, &QDATA.0); 
         self.reduce();
     } 
 
@@ -62,9 +65,10 @@ impl Poly {
         unsafe {
             let qdata_ptr = QDATA.0.as_ptr();
             let self_ptr = self.coeffs.as_mut_ptr();
-            
+            let prod = ((s as i64) * (QINV as i64)) as i32;
+
             let q = _mm256_load_si256(qdata_ptr.add(_8XQ) as *const __m256i);
-            let lo = _mm256_set1_epi32(s*QINV);
+            let lo = _mm256_set1_epi32(prod);
             let hi = _mm256_set1_epi32(s);
 
             for i in (0..N).step_by(8) {
@@ -91,9 +95,10 @@ impl Poly {
             let qdata_ptr = QDATA.0.as_ptr();
             let a_ptr = a.coeffs.as_ptr();
             let r_ptr = r.coeffs.as_mut_ptr();
+            let prod = ((s as i64) * (QINV as i64)) as i32;
 
             let q = _mm256_load_si256(qdata_ptr.add(_8XQ) as *const __m256i);
-            let lo = _mm256_set1_epi32(s*QINV);
+            let lo = _mm256_set1_epi32(prod);
             let hi = _mm256_set1_epi32(s);
 
             for i in (0..N).step_by(8) {
@@ -116,12 +121,12 @@ impl Poly {
 
     pub fn inverse_ntt(&mut self) {
         self.scale_montgomery(33554432);
-        inverse_ntt(&mut self.coeffs, QDATA.0);
+        inverse_ntt(&mut self.coeffs, &QDATA.0);
     }
 
     pub fn inverse_ntt_tomont(&mut self) {
         self.scale_montgomery(-132153352);
-        inverse_ntt(&mut self.coeffs, QDATA.0);
+        inverse_ntt(&mut self.coeffs, &QDATA.0);
     }
 
     pub fn rej_uniform (r: &mut [i32], buf: &[u8]) -> usize {
@@ -195,10 +200,12 @@ impl Poly {
         }
     }
 
-    pub fn uniform_random(r: &mut Poly, seed: &[u8; SYMBYTES], nonce: u16) {
+    pub fn uniform_random(seed: &[u8; SYMBYTES], nonce: u16) -> Poly {
+        let mut r = Poly::new();
         unsafe{
             let mut state = Aes256Ctx::init(seed, nonce as u64);
-            Self::uniform_preinit(r, &mut state);
+            Self::uniform_preinit(&mut r, &mut state);
         }
+        r
     }
 }
