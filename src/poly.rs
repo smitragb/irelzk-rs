@@ -306,7 +306,7 @@ impl Poly {
         unsafe {
             for i in (0..N).step_by(8) {
                 let f = _mm256_load_si256(coeffs_ptr.add(i) as *const __m256i);
-                let g = _mm256_load_si256(other_coeffs_ptr.add(8) as *const __m256i);
+                let g = _mm256_load_si256(other_coeffs_ptr.add(i) as *const __m256i);
                 let h = _mm256_add_epi32(f, g);
                 _mm256_store_si256(coeffs_ptr.add(i) as *mut __m256i, h);
             }
@@ -335,7 +335,7 @@ impl Poly {
         unsafe {
             for i in (0..N).step_by(8) {
                 let f = _mm256_load_si256(coeffs_ptr.add(i) as *const __m256i);
-                let g = _mm256_load_si256(other_coeffs_ptr.add(8) as *const __m256i);
+                let g = _mm256_load_si256(other_coeffs_ptr.add(i) as *const __m256i);
                 let h = _mm256_sub_epi32(f, g);
                 _mm256_store_si256(coeffs_ptr.add(i) as *mut __m256i, h);
             }
