@@ -74,3 +74,47 @@ fn test_gamma_output() {
     Poly::uniform_gamma(&mut a, &seed, 0);
     assert!(Poly::check_norm(&a, 1 << 17));
 }
+
+#[test]
+fn test_sigma() {
+    let mut seed = [0u8; SYMBYTES];
+    OsRng.fill_bytes(&mut seed);
+    let mut f = Poly::new();
+    Poly::uniform_random(&mut f, &seed, 0);
+    let mut g = Poly::sigma(&f, 65);
+    f.ntt(); g.ntt();
+    f.freeze(); g.freeze();
+    let mut h = Poly::new();
+    for i in 0..N {
+        let idx = lut(i as isize,65) as usize;
+        h.coeffs[i] = f.coeffs[idx];
+    }
+    Poly::sub_other(&mut f, &g, &h);
+    for i in 0..N {
+        let index = idx(i as isize) as usize;
+        assert_eq!(f.coeffs[index], 0, "Failing at index {}", i);
+    }
+}
+
+#[test]
+fn test_trace65() {
+    let mut seed = [0u8; SYMBYTES];
+    OsRng.fill_bytes(&mut seed);
+    let mut f = Poly::new();
+    Poly::uniform_random(&mut f, &seed, 0);
+    let mut h = Poly::sigma(&f, 65);
+    let mut g = Poly::new();
+    Poly::add_other(&mut g, &f, &h);
+    h = Poly::sigma(&f, 129);
+    g.add(&h);
+    h = Poly::sigma(&f, 193);
+    g.add(&h);
+    f.ntt(); g.ntt();
+    f.trace65_ntt();
+    f.sub(&g);
+    f.freeze();
+    for i in 0..N {
+        let index = idx(i as isize) as usize;
+        assert_eq!(f.coeffs[index], 0, "Failing at index {}", i);
+    }
+}

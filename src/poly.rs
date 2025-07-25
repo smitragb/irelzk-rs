@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use std::{arch::x86_64::*, ops::{Deref, DerefMut}};
+use std::arch::x86_64::*;
 
 use crate::{
     consts::{QDATA, QINV, REJIDX, _8XQ, _8XQINV}, crypto::aes256::{Aes256Ctx, AES256CTR_BLOCKBYTES}, ntt::{forward_ntt, inverse_ntt}, params::{N, Q, SYMBYTES}, rounding::{decompose_avx, makehint_avx, power2round_avx, usehint_avx}
@@ -14,22 +14,10 @@ pub struct Poly{
 #[repr(align(32))]
 pub struct AlignedBuf<const S: usize>([u8; S]);
 
-impl<const S: usize> Deref for AlignedBuf<S> {
-    type Target = [u8; S]; 
-    fn deref(&self) -> &Self::Target {
-        &self.0
-    }
-}
-
-impl<const S:usize> DerefMut for AlignedBuf<S> {
-    fn deref_mut(&mut self) -> &mut Self::Target {
-        &mut self.0
-    }
-}
-
 pub const REJ_UNIFORM_BUFLEN: usize = ((512+AES256CTR_BLOCKBYTES - 1)/AES256CTR_BLOCKBYTES)*AES256CTR_BLOCKBYTES;
 pub const POLY_UNIFORM_NBLOCKS: usize = (512+AES256CTR_BLOCKBYTES - 1)/AES256CTR_BLOCKBYTES;
 pub const POLY_UNIFORM_GAMMA_NBLOCKS: usize = (304+AES256CTR_BLOCKBYTES - 1)/AES256CTR_BLOCKBYTES;
+
 impl Poly {
     pub fn new() -> Self {
         Self {

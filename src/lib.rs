@@ -9,7 +9,7 @@ pub mod poly;
 pub mod ntt;
 pub mod consts;
 pub mod rounding;
-
+pub mod polyvec;
 use params::{Q, GAMMA2};
 use crate::crypto::aes256::Aes256Ctx;
 use crate::crypto::shake::Shake128;

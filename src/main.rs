@@ -8,6 +8,7 @@ pub mod crypto {
     pub mod shake;
     pub mod keccak;
 }
+pub mod polyvec;
 use consts::{MONT, QDATA, _8XDIV, _8XQ, _8XQINV, _PMASK, _ZETAS, _ZETAS_QINV};
 use params::Q;
 
