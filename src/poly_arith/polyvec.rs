@@ -3,7 +3,7 @@ use crate::poly_arith::poly::Poly;
 use crate::params::{K, L, M};
 
 pub struct PolyVec<const S: usize> {
-    vec: [Poly; S]
+    pub vec: [Poly; S]
 }
 
 impl<const S: usize> PolyVec<S> {
