@@ -11,6 +11,10 @@ pub mod poly_arith {
     pub mod rounding;
     pub mod ntt;
 }
+pub mod comm {
+    pub mod commitment;
+    pub mod opening;
+}
 
 use poly_arith::consts::{MONT, QDATA, _8XDIV, _8XQ, _8XQINV, _PMASK, _ZETAS, _ZETAS_QINV};
 use params::Q;

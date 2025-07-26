@@ -12,6 +12,10 @@ pub mod poly_arith {
     pub mod rounding;
     pub mod polyvec;
 }
+pub mod comm {
+    pub mod commitment;
+    pub mod opening;
+}
 use params::{Q, GAMMA2};
 use crate::crypto::aes256::Aes256Ctx;
 use crate::crypto::shake::Shake128;

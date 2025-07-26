@@ -178,22 +178,18 @@ impl Poly {
         let mut ctr = 0;
         const BUFSIZE: usize = POLY_UNIFORM_NBLOCKS * AES256CTR_BLOCKBYTES;
         let mut buf = AlignedBuf::<BUFSIZE>([0u8; BUFSIZE]);
-        unsafe { 
-            state.squeezeblocks(&mut buf.0, POLY_UNIFORM_NBLOCKS);
-            ctr += Self::rej_uniform_avx(&mut r.coeffs, &buf.0);
+        state.squeezeblocks(&mut buf.0, POLY_UNIFORM_NBLOCKS);
+        ctr += Self::rej_uniform_avx(&mut r.coeffs, &buf.0);
 
-            while ctr < N {
-                state.squeezeblocks(&mut buf.0, 1);
-                ctr += Self::rej_uniform(&mut r.coeffs[ctr..], &buf.0)
-            }
+        while ctr < N {
+            state.squeezeblocks(&mut buf.0, 1);
+            ctr += Self::rej_uniform(&mut r.coeffs[ctr..], &buf.0)
         }
     }
 
     pub fn uniform_random(r: &mut Poly, seed: &[u8; SYMBYTES], nonce: u16) {
-        unsafe{
-            let mut state = Aes256Ctx::init(seed, nonce as u64);
-            Self::uniform_preinit(r, &mut state);
-        }
+        let mut state = Aes256Ctx::init(seed, nonce as u64);
+        Self::uniform_preinit(r, &mut state);
     }
 
     pub fn trinary_preinit(r: &mut Poly, state: &mut Aes256Ctx) {
@@ -230,10 +226,9 @@ impl Poly {
     }
 
     pub fn trinary(r: &mut Poly, seed: &[u8; SYMBYTES], nonce: u16) {
-        unsafe { 
-            let mut state = Aes256Ctx::init(seed, nonce as u64); 
-            Self::trinary_preinit(r, &mut state);
-        }
+        let mut state = Aes256Ctx::init(seed, nonce as u64); 
+        Self::trinary_preinit(r, &mut state);
+
     }
 
     pub fn uniform_gamma_preinit(r: &mut Poly, state: &mut Aes256Ctx) {
@@ -267,10 +262,8 @@ impl Poly {
     }
 
     pub fn uniform_gamma(r: &mut Poly, seed: &[u8; SYMBYTES], nonce: u16) {
-        unsafe {
-            let mut state = Aes256Ctx::init(seed, nonce as u64);
-            Self::uniform_gamma_preinit(r, &mut state);
-        }
+        let mut state = Aes256Ctx::init(seed, nonce as u64);
+        Self::uniform_gamma_preinit(r, &mut state);
     }
     
     pub fn freeze(&mut self) {

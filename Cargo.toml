@@ -6,6 +6,7 @@ build = "build.rs"
 
 [dependencies]
 rand = "0.8"
+array-init = "2"
 
 [dev-dependencies]
 hex = "0.4"

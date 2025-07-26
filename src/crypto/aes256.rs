@@ -13,106 +13,110 @@ pub const AES256CTR_BLOCKBYTES: usize = 64;
 #[allow(dead_code)]
 impl Aes256Ctx {
 
-    pub unsafe fn init(key: &[u8; 32], nonce: u64) -> Self {
-        let mut rkeys = [_mm_setzero_si128(); 16];
-        let mut idx = 0;
-        let n: __m128i = _mm_loadl_epi64(&nonce as *const u64 as *const __m128i);
+    pub fn init(key: &[u8; 32], nonce: u64) -> Self {
+        unsafe {
+            let mut rkeys = [_mm_setzero_si128(); 16];
+            let mut idx = 0;
+            let n: __m128i = _mm_loadl_epi64(&nonce as *const u64 as *const __m128i);
 
-        let key0 = _mm_loadu_si128(key.as_ptr() as *const __m128i);
-        let key1 = _mm_loadu_si128(key.as_ptr().add(16) as *const __m128i);
+            let key0 = _mm_loadu_si128(key.as_ptr() as *const __m128i);
+            let key1 = _mm_loadu_si128(key.as_ptr().add(16) as *const __m128i);
 
-        rkeys[idx] = key0;
-        idx += 1;
+            rkeys[idx] = key0;
+            idx += 1;
         
-        let mut temp0 = key0;
-        let mut temp2 = key1;
-        let mut temp4 = _mm_setzero_si128();
+            let mut temp0 = key0;
+            let mut temp2 = key1;
+            let mut temp4 = _mm_setzero_si128();
 
-        macro_rules! BLOCK1 {
-            ($imm: expr) => {
-                let mut temp1 = _mm_aeskeygenassist_si128(temp2, $imm);
-                rkeys[idx] = temp2;
-                idx += 1;
+            macro_rules! BLOCK1 {
+                ($imm: expr) => {
+                    let mut temp1 = _mm_aeskeygenassist_si128(temp2, $imm);
+                    rkeys[idx] = temp2;
+                    idx += 1;
                     
-                temp4 = _mm_castps_si128(_mm_shuffle_ps(
-                        _mm_castsi128_ps(temp4), _mm_castsi128_ps(temp0), 0x10
-                ));
-                temp0 = _mm_xor_si128(temp0, temp4);
+                    temp4 = _mm_castps_si128(_mm_shuffle_ps(
+                            _mm_castsi128_ps(temp4), _mm_castsi128_ps(temp0), 0x10
+                    ));
+                    temp0 = _mm_xor_si128(temp0, temp4);
 
-                temp4 = _mm_castps_si128(_mm_shuffle_ps(
-                        _mm_castsi128_ps(temp4), _mm_castsi128_ps(temp0), 0x8c
-                ));
-                temp0 = _mm_xor_si128(temp0, temp4);
+                    temp4 = _mm_castps_si128(_mm_shuffle_ps(
+                            _mm_castsi128_ps(temp4), _mm_castsi128_ps(temp0), 0x8c
+                    ));
+                    temp0 = _mm_xor_si128(temp0, temp4);
                     
-                temp1 = _mm_castps_si128(_mm_shuffle_ps(
-                        _mm_castsi128_ps(temp1), _mm_castsi128_ps(temp1), 0xff
-                ));
-                temp0 = _mm_xor_si128(temp0, temp1);
-            };
+                    temp1 = _mm_castps_si128(_mm_shuffle_ps(
+                            _mm_castsi128_ps(temp1), _mm_castsi128_ps(temp1), 0xff
+                    ));
+                    temp0 = _mm_xor_si128(temp0, temp1);
+                };
+            }
+
+            macro_rules! BLOCK2 {
+                ($imm: expr) => {
+                    let mut temp1 = _mm_aeskeygenassist_si128(temp0, $imm);
+                    rkeys[idx] = temp0;
+                    idx += 1;
+
+                    temp4 = _mm_castps_si128(_mm_shuffle_ps(
+                            _mm_castsi128_ps(temp4), _mm_castsi128_ps(temp2), 0x10
+                    ));
+                    temp2 = _mm_xor_si128(temp2, temp4);
+        
+                    temp4 = _mm_castps_si128(_mm_shuffle_ps(
+                            _mm_castsi128_ps(temp4), _mm_castsi128_ps(temp2), 0x8c
+                    ));
+                    temp2 = _mm_xor_si128(temp2, temp4);
+                        
+                    temp1 = _mm_castps_si128(_mm_shuffle_ps(
+                            _mm_castsi128_ps(temp1), _mm_castsi128_ps(temp1), 0xaa
+                    ));
+                    temp2 = _mm_xor_si128(temp2, temp1);
+                };
+            }
+
+            BLOCK1!(0x01);
+            BLOCK2!(0x01);
+            
+            BLOCK1!(0x02);
+            BLOCK2!(0x02);
+
+            BLOCK1!(0x04);
+            BLOCK2!(0x04);
+
+            BLOCK1!(0x08);
+            BLOCK2!(0x08);
+            
+            BLOCK1!(0x10);
+            BLOCK2!(0x10);
+            
+            BLOCK1!(0x20);
+            BLOCK2!(0x20);
+
+            BLOCK1!(0x40);
+
+            rkeys[idx] = temp0;
+
+            Aes256Ctx { rkeys, n }
         }
-
-        macro_rules! BLOCK2 {
-            ($imm: expr) => {
-                let mut temp1 = _mm_aeskeygenassist_si128(temp0, $imm);
-                rkeys[idx] = temp0;
-                idx += 1;
-
-                temp4 = _mm_castps_si128(_mm_shuffle_ps(
-                        _mm_castsi128_ps(temp4), _mm_castsi128_ps(temp2), 0x10
-                ));
-                temp2 = _mm_xor_si128(temp2, temp4);
-
-                temp4 = _mm_castps_si128(_mm_shuffle_ps(
-                        _mm_castsi128_ps(temp4), _mm_castsi128_ps(temp2), 0x8c
-                ));
-                temp2 = _mm_xor_si128(temp2, temp4);
-                    
-                temp1 = _mm_castps_si128(_mm_shuffle_ps(
-                        _mm_castsi128_ps(temp1), _mm_castsi128_ps(temp1), 0xaa
-                ));
-                temp2 = _mm_xor_si128(temp2, temp1);
-            };
-        }
-
-        BLOCK1!(0x01);
-        BLOCK2!(0x01);
-            
-        BLOCK1!(0x02);
-        BLOCK2!(0x02);
-
-        BLOCK1!(0x04);
-        BLOCK2!(0x04);
-
-        BLOCK1!(0x08);
-        BLOCK2!(0x08);
-            
-        BLOCK1!(0x10);
-        BLOCK2!(0x10);
-            
-        BLOCK1!(0x20);
-        BLOCK2!(0x20);
-
-        BLOCK1!(0x40);
-
-        rkeys[idx] = temp0;
-
-        Aes256Ctx { rkeys, n }
     } 
 
 
     #[allow(dead_code)]
-    pub unsafe fn prf (out: &mut [u8], seed: &[u8; 32], nonce: u64) {
-        let mut ctx = Aes256Ctx::init(seed, nonce);
-        let chunk_size = 64;
-        let mut chunks = out.chunks_exact_mut(chunk_size);
-        for chunk in &mut chunks {
-            ctx.encrypt4(chunk.try_into().unwrap());
-        }
-        let final_chunk = chunks.into_remainder();
-        if !final_chunk.is_empty() {
-            let mut buf = [0u8; 64];
-            ctx.encrypt4(&mut buf);
-            final_chunk.copy_from_slice(&buf[..final_chunk.len()]);
+    pub fn prf (out: &mut [u8], seed: &[u8; 32], nonce: u64) {
+        unsafe {
+            let mut ctx = Aes256Ctx::init(seed, nonce);
+            let chunk_size = 64;
+            let mut chunks = out.chunks_exact_mut(chunk_size);
+            for chunk in &mut chunks {
+                ctx.encrypt4(chunk.try_into().unwrap());
+            }
+            let final_chunk = chunks.into_remainder();
+            if !final_chunk.is_empty() {
+                let mut buf = [0u8; 64];
+                ctx.encrypt4(&mut buf);
+                final_chunk.copy_from_slice(&buf[..final_chunk.len()]);
+            }
         }
     } 
     
@@ -164,7 +168,7 @@ impl Aes256Ctx {
 
     }
 
-    pub unsafe fn squeezeblocks(&mut self, out: &mut [u8], nblocks: usize) {
+    pub fn squeezeblocks(&mut self, out: &mut [u8], nblocks: usize) {
         assert!(out.len() >= 64*nblocks);
         for chunk in out.chunks_exact_mut(64) {
             unsafe {
