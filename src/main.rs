@@ -1,15 +1,18 @@
 pub mod params;
-pub mod poly;
-pub mod rounding;
-pub mod ntt;
-pub mod consts;
 pub mod crypto {
     pub mod aes256;
     pub mod shake;
     pub mod keccak;
 }
-pub mod polyvec;
-use consts::{MONT, QDATA, _8XDIV, _8XQ, _8XQINV, _PMASK, _ZETAS, _ZETAS_QINV};
+pub mod poly_arith {
+    pub mod poly;
+    pub mod polyvec;
+    pub mod consts;
+    pub mod rounding;
+    pub mod ntt;
+}
+
+use poly_arith::consts::{MONT, QDATA, _8XDIV, _8XQ, _8XQINV, _PMASK, _ZETAS, _ZETAS_QINV};
 use params::Q;
 
 fn main() {

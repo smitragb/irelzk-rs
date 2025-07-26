@@ -2,7 +2,11 @@
 use std::arch::x86_64::*;
 
 use crate::{
-    consts::{QDATA, QINV, REJIDX, _8XQ, _8XQINV}, crypto::aes256::{Aes256Ctx, AES256CTR_BLOCKBYTES}, ntt::{forward_ntt, inverse_ntt}, params::{N, Q, SYMBYTES}, rounding::{decompose_avx, makehint_avx, power2round_avx, usehint_avx}
+    poly_arith::consts::{QDATA, QINV, REJIDX, _8XQ, _8XQINV}, 
+    crypto::aes256::{Aes256Ctx, AES256CTR_BLOCKBYTES}, 
+    poly_arith::ntt::*, 
+    params::{N, Q, SYMBYTES}, 
+    poly_arith::rounding::*,
 };
 
 #[repr(align(32))]

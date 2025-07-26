@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 #![allow(unused_imports)]
 
-use irelzk_rs::{params::{N, Q, SYMBYTES}, poly::Poly};
+use irelzk_rs::{params::{N, Q, SYMBYTES}, poly_arith::poly::Poly};
 use rand::{rngs::OsRng, RngCore};
 
 fn pow (base: i32, exp: usize) -> i32 {

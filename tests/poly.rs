@@ -1,5 +1,5 @@
 #![allow(dead_code)]
-use irelzk_rs::{params::{N, SYMBYTES}, poly::Poly};
+use irelzk_rs::{params::{N, SYMBYTES}, poly_arith::poly::Poly};
 use rand::{rngs::OsRng, RngCore};
 
 fn bitrev7(a: u8) -> u8 {

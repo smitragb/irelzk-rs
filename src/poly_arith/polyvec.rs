@@ -1,5 +1,6 @@
 #![allow(dead_code)]
-use crate::poly::Poly;
+use crate::poly_arith::poly::Poly;
+use crate::params::{K, L, M};
 
 pub struct PolyVec<const S: usize> {
     vec: [Poly; S]
@@ -115,4 +116,8 @@ impl<const S: usize> PolyVec<S> {
             Poly::usehint(&mut v1.vec[i], &mut v.vec[i], &h.vec[i]);
         }
     }
- }
+}
+
+pub type PolyVecK = PolyVec<K>;
+pub type PolyVecL = PolyVec<L>;
+pub type PolyVecM = PolyVec<M>;
