@@ -49,4 +49,11 @@ impl Shake128 {
             self.state.pos
         );
     }
+
+    pub fn hash(out: &mut [u8], input: &[u8]) {
+        let mut state = Shake128::init();
+        state.absorb(input);
+        state.finalize();
+        state.squeeze(out);
+    }
 }

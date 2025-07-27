@@ -12,20 +12,20 @@ use crate::{
 };
 
 pub struct Comm {
-   t0: PolyVecK,
-   tm: PolyVecM,
+   pub t0: PolyVecK,
+   pub tm: PolyVecM,
 }
 
 pub struct CommRnd {
-    s: PolyVecL,
-    e: PolyVecK,
-    em: PolyVecM,
+    pub  s: PolyVecL,
+    pub  e: PolyVecK,
+    pub em: PolyVecM,
 }
 
 pub struct CommKey {
-    b0: [PolyVecL; K],
-    bt: [PolyVecM; K],
-    bm: [PolyVecL; M],
+    pub b0: [PolyVecL; K],
+    pub bt: [PolyVecM; K],
+    pub bm: [PolyVecL; M],
 }
 
 impl CommKey {
@@ -90,6 +90,22 @@ impl CommRnd {
             em: PolyVecM { vec: std::array::from_fn(|_| make_vec()) },
         }
     }    
+
+    pub fn generate_y(state: &mut Aes256Ctx, nonce: u64) -> Self {
+        let mut n = nonce;
+        let mut make_vec = || {
+            n += 1;
+            state.select(n);
+            let mut a = Poly::new();
+            Poly::uniform_gamma_preinit(&mut a, state);
+            a
+        };
+        Self {
+             s: PolyVecL { vec: std::array::from_fn(|_| make_vec())  },
+             e: PolyVecK { vec: std::array::from_fn(|_| Poly::new()) },
+            em: PolyVecM { vec: std::array::from_fn(|_| make_vec())  },
+        }
+    }
 }
 
 impl Comm {

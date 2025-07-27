@@ -9,11 +9,17 @@ use crate::{
     poly_arith::rounding::*,
 };
 
-#[repr(align(32))]
-#[derive(Debug, Clone)]
+use bytemuck::{Pod, Zeroable};
+
+
+#[repr(C, align(32))]
+#[derive(Debug, Clone, Copy)]
 pub struct Poly{
     pub coeffs: [i32; N],
 }
+
+unsafe impl Zeroable for Poly {}
+unsafe impl Pod for Poly {}
 
 #[repr(align(32))]
 pub struct AlignedBuf<const S: usize>([u8; S]);
@@ -664,10 +670,16 @@ impl Poly {
         power2round_avx(&mut a1.coeffs, &mut a0.coeffs, &a.coeffs);
     }
 
-    pub fn decompose (a1: &mut Poly, a0: &mut Poly, a: &mut Poly) {
+    pub fn decompose_other (a1: &mut Poly, a0: &mut Poly, a: &mut Poly) {
         a.reduce();
         a.freeze();
         decompose_avx(&mut a1.coeffs, &mut a0.coeffs, &a.coeffs);
+    }
+
+    pub fn decompose (&mut self, a0: &mut Poly) {
+        self.reduce();
+        self.freeze();
+        decompose_avx_self(&mut self.coeffs, &mut a0.coeffs);
     }
 
     pub fn makehint (h: &mut Poly, a1: &Poly, a0: &mut Poly) {
@@ -675,9 +687,15 @@ impl Poly {
         makehint_avx(&mut h.coeffs, &a1.coeffs, &a0.coeffs);
     }
 
-    pub fn usehint (b1: &mut Poly, a: &mut Poly, h: &Poly) {
+    pub fn usehint_other (b1: &mut Poly, a: &mut Poly, h: &Poly) {
         a.reduce();
         a.freeze();
         usehint_avx(&mut b1.coeffs, &a.coeffs, &h.coeffs);
+    }
+
+    pub fn usehint (&mut self, h: &Poly) {
+        self.reduce();
+        self.freeze();
+        usehint_avx_self(&mut self.coeffs, &h.coeffs);
     }
 }

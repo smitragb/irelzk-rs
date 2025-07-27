@@ -1,15 +1,28 @@
 #![allow(dead_code)]
+use bytemuck::{Pod, Zeroable};
+
 use crate::poly_arith::poly::Poly;
 use crate::params::{K, L, M};
 
+#[repr(C)]
+#[derive(Debug, Clone, Copy)]
 pub struct PolyVec<const S: usize> {
     pub vec: [Poly; S]
 }
+
+unsafe impl<const S: usize> Zeroable for PolyVec<S> {}
+unsafe impl<const S: usize> Pod for PolyVec<S> {}
 
 impl<const S: usize> PolyVec<S> {
     pub fn new() -> Self {
         Self {
             vec: std::array::from_fn(|_| Poly::new())
+        }
+    }
+
+    pub fn reduce(&mut self) {
+        for i in 0..S {
+            self.vec[i].reduce();
         }
     }
 
@@ -99,9 +112,15 @@ impl<const S: usize> PolyVec<S> {
         }
     }
 
-    pub fn vec_decompose (v1: &mut PolyVec<S>, v0: &mut PolyVec<S>, v: &mut PolyVec<S>) {
+    pub fn vec_decompose_other (v1: &mut PolyVec<S>, v0: &mut PolyVec<S>, v: &mut PolyVec<S>) {
         for i in 0..S {
-            Poly::decompose(&mut v1.vec[i], &mut v0.vec[i], &mut v.vec[i]);
+            Poly::decompose_other(&mut v1.vec[i], &mut v0.vec[i], &mut v.vec[i]);
+        }
+    }
+
+    pub fn vec_decompose (&mut self, v0: &mut PolyVec<S>) {
+        for i in 0..S {
+            self.vec[i].decompose(&mut v0.vec[i]);
         }
     }
 
@@ -111,9 +130,15 @@ impl<const S: usize> PolyVec<S> {
         }
     }
 
-    pub fn vec_usehint (v1: &mut PolyVec<S>, v: &mut PolyVec<S>, h: &PolyVec<S>) {
+    pub fn vec_usehint_other (v1: &mut PolyVec<S>, v: &mut PolyVec<S>, h: &PolyVec<S>) {
         for i in 0..S {
-            Poly::usehint(&mut v1.vec[i], &mut v.vec[i], &h.vec[i]);
+            Poly::usehint_other(&mut v1.vec[i], &mut v.vec[i], &h.vec[i]);
+        }
+    }
+
+    pub fn vec_usehint (&mut self, h: &PolyVec<S>) {
+        for i in 0..S {
+            self.vec[i].usehint(&h.vec[i]);
         }
     }
 }
