@@ -16,6 +16,10 @@ pub mod comm {
     pub mod commitment;
     pub mod opening;
 }
+pub mod addition {
+    pub mod linear;
+    pub mod product;
+}
 use params::{Q, GAMMA2};
 use crate::crypto::aes256::Aes256Ctx;
 use crate::crypto::shake::Shake128;

@@ -15,6 +15,10 @@ pub mod comm {
     pub mod commitment;
     pub mod opening;
 }
+pub mod addition {
+    pub mod linear;
+    pub mod product;
+}
 
 use poly_arith::consts::{MONT, QDATA, _8XDIV, _8XQ, _8XQINV, _PMASK, _ZETAS, _ZETAS_QINV};
 use params::Q;
