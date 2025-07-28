@@ -24,6 +24,26 @@ pub fn power2round_avx(a1: &mut [i32; N], a0: &mut [i32; N], a: &[i32; N]) {
     }
 }
 
+pub fn power2round_avx_self (a1: &mut [i32; N], a0: &mut [i32; N]) {
+    unsafe {
+        let mask = _mm256_set1_epi32(-(1 << D));
+        let half = _mm256_set1_epi32((1 << (D-1)) - 1);
+
+        let a0_ptr = a0.as_mut_ptr();
+        let a1_ptr = a1.as_mut_ptr();
+
+        for i in 0..(N/8) {
+            let f = _mm256_load_si256(a1_ptr.add(8*i) as *const __m256i);
+            let mut f1 = _mm256_add_epi32(f, half);
+            let mut f0 = _mm256_and_si256(f1, mask);
+            f1 = _mm256_srai_epi32(f1, D as i32);
+            f0 = _mm256_sub_epi32(f, f0);
+            _mm256_store_si256(a1_ptr.add(8*i) as *mut __m256i, f1);
+            _mm256_store_si256(a0_ptr.add(8*i) as *mut __m256i, f0);
+        }
+    }
+}
+
 pub fn decompose_avx(a1: &mut [i32; N], a0: &mut [i32; N], a: &[i32; N]) {
     unsafe {
         let a_ptr = a.as_ptr();

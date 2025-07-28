@@ -72,6 +72,14 @@ impl CommKey {
 }
 
 impl CommRnd {
+    pub fn new() -> Self {
+        Self {
+             s: PolyVecL::new(),
+             e: PolyVecK::new(),
+            em: PolyVecM::new(),
+        }
+    }
+
     pub fn generate() -> Self {
         let mut buf = [0u8; SYMBYTES];
         OsRng.fill_bytes(&mut buf);

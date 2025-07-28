@@ -32,14 +32,15 @@ pub fn challenge (w: &[PolyVecK; R]) {
     challenge_prehash(&mut c, &chash);
 }
 
-pub fn generate_y (y: &mut [CommRnd; R], seed: &[u8; SYMBYTES], nonce: u16) {
+pub fn generate_y (seed: &[u8; SYMBYTES], nonce: u16) -> [CommRnd; R] {
     let mut n = nonce as u64;
     let mut state = Aes256Ctx::init(&seed, n);
 
-    for i in 0..R {
-        y[i] = CommRnd::generate_y(&mut state, n);
+    std::array::from_fn(|_| {
+        let y = CommRnd::generate_y(&mut state, n);
         n += (L+M) as u64;
-    }
+        y
+    })
 }
 
 pub fn first (

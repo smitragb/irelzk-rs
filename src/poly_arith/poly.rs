@@ -664,11 +664,18 @@ impl Poly {
         }
     }
 
-    pub fn power2round (a1: &mut Poly, a0: &mut Poly, a: &mut Poly) {
+    pub fn power2round_other (a1: &mut Poly, a0: &mut Poly, a: &mut Poly) {
         a.reduce();
         a.freeze();
         power2round_avx(&mut a1.coeffs, &mut a0.coeffs, &a.coeffs);
     }
+
+    pub fn power2round (a1: &mut Poly, a0: &mut Poly) {
+        a1.reduce();
+        a1.freeze();
+        power2round_avx_self(&mut a1.coeffs, &mut a0.coeffs);
+    }
+
 
     pub fn decompose_other (a1: &mut Poly, a0: &mut Poly, a: &mut Poly) {
         a.reduce();

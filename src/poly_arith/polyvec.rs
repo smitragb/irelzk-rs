@@ -106,9 +106,15 @@ impl<const S: usize> PolyVec<S> {
         return false;
     }
 
-    pub fn vec_power2round (v1: &mut PolyVec<S>, v0: &mut PolyVec<S>, v: &mut PolyVec<S>) {
+    pub fn vec_power2round_other (v1: &mut PolyVec<S>, v0: &mut PolyVec<S>, v: &mut PolyVec<S>) {
         for i in 0..S {
-            Poly::power2round(&mut v1.vec[i], &mut v0.vec[i], &mut v.vec[i]);
+            Poly::power2round_other(&mut v1.vec[i], &mut v0.vec[i], &mut v.vec[i]);
+        }
+    }
+
+    pub fn vec_power2round (v1: &mut PolyVec<S>, v0: &mut PolyVec<S>) {
+        for i in 0..S {
+            Poly::power2round(&mut v1.vec[i], &mut v0.vec[i]);
         }
     }
 
